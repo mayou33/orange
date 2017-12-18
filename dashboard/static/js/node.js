@@ -36,11 +36,16 @@
                                 return false;
                             }
 
-                            if (!ip || ip.length < 7 || ip.length > 15) {
+                            var ipPattern = /^\d{1,3}(\.\d{1,3}){3}$/;
+                            if (!ip || ip.length < 7 || ip.length > 15 || !(ipPattern.test(ip))) {
                                 L.Common.showErrorTip("提示", "IP 长度须为7~15位!");
                                 return false;
                             }
 
+                            if (!port || port < 1 || port > 65535) {
+                                L.Common.showErrorTip("提示", "端口为 1~65535 间的数字!");
+                                return false;
+                            }
 
                             $.ajax({
                                 url: '/admin/node/new',
@@ -161,6 +166,23 @@
                             var port = $("input[name=port]").val();
                             var api_username = $("input[name=api_username]").val();
                             var api_password = $("input[name=api_password]").val();
+
+                            var pattern = /^[A-Za-z][A-Za-z0-9_]+$/;
+                            if (!name || name.length < 1 || name.length > 20 || !name.match(pattern)) {
+                                L.Common.showErrorTip("提示", "节点名称为1~20位, 只能输入字母、下划线、数字，必须以字母开头.");
+                                return false;
+                            }
+                            
+                            var ipPattern = /^\d{1,3}(\.\d{1,3}){3}$/;
+                            if (!ip || ip.length < 7 || ip.length > 15 || !(ipPattern.test(ip))) {
+                                L.Common.showErrorTip("提示", "IP 长度须为7~15位!");
+                                return false;
+                            }
+
+                            if (!port || port < 1 || port > 65535) {
+                                L.Common.showErrorTip("提示", "端口为 1~65535 间的数字!");
+                                return false;
+                            }
 
                             $.ajax({
                                 url: '/admin/node/modify',

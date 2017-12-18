@@ -7,13 +7,12 @@ local string_format = string.format
 local lor = require("lor.index")
 
 
+-- 节点同步
 local function sync(nodes, plugs)
 
     results = {}
 
     for i, node in pairs(nodes) do
-
-
         if node.ip and node.port and node.api_username and node.api_password then
 
             node_result = {
@@ -103,6 +102,7 @@ return function(config, store)
         local api_username = req.body.api_username
         local api_password = req.body.api_password
 
+        -- name
         local pattern = "^[a-zA-Z][0-9a-zA-Z_]+$"
         local match, err = smatch(name, pattern)
 
@@ -123,13 +123,6 @@ return function(config, store)
             })
         end
 
-        if ip_len < 7 and ip_len > 12 then
-            return res:json({
-                success = false,
-                msg = "IP长度应为7-12位."
-            })
-        end
-
         if not match then
             return res:json({
                 success = false,
@@ -137,6 +130,34 @@ return function(config, store)
             })
         end
 
+        -- ip
+        if ip_len < 7 and ip_len > 15 then
+            return res:json({
+                success = false,
+                msg = "IP 长度应为 7-15 位."
+            })
+        end
+
+        local ip_pattern = "^\d{1,3}(\.\d{1,3}){3}$"
+        local ip_match, err = smatch(ip, ip_pattern)
+
+        if not ip_match then
+            return res:json({
+                success = false,
+                msg = "IP 格式不正确"
+            })
+        end
+
+        -- port
+        if port < 1 or port > 65535 then
+            return json:json({
+                success =false,
+                msg = "端口号为 1~65535 间的数字"
+            })
+        end
+
+
+        -- check ip
         local result, err = node_model:query_by_ip(ip)
         local isExist = false
         if result and not err then
@@ -146,9 +167,10 @@ return function(config, store)
         if isExist == true then
             return res:json({
                 success = false,
-                msg = "节点IP已被占用，请修改."
+                msg = "该节点 IP 已添加到节点集群中"
             })
         else
+            -- save node info to db
             local result, err = node_model:new(name, ip, port, api_username, api_password)
             if result and not err then
                 return res:json({
@@ -191,13 +213,14 @@ return function(config, store)
         local pattern = "^[a-zA-Z][0-9a-zA-Z_]+$"
         local match, err = smatch(name, pattern)
 
-        if not name or not ip or name == "" or ip == "" then
+        if not name or not ip or name == "" or ip == "" or port == "" then
             return res:json({
                 success = false,
-                msg = "节点名和IP不得为空."
+                msg = "节点名、IP、端口不得为空."
             })
         end
 
+        -- name
         local name_len = slen(name)
         local ip_len = slen(ip)
 
@@ -208,13 +231,6 @@ return function(config, store)
             })
         end
 
-        if ip_len < 7 and ip_len > 15 then
-            return res:json({
-                success = false,
-                msg = "IP长度应为7-15位."
-            })
-        end
-
         if not match then
             return res:json({
                 success = false,
@@ -222,6 +238,33 @@ return function(config, store)
             })
         end
 
+        -- ip
+        if ip_len < 7 and ip_len > 15 then
+            return res:json({
+                success = false,
+                msg = "IP 长度应为 7-15 位."
+            })
+        end
+
+        local ip_pattern = "^\d{1,3}(\.\d{1,3}){3}$"
+        local ip_match, err = smatch(ip, ip_pattern)
+
+        if not ip_match then
+            return res:json({
+                success = false,
+                msg = "IP 格式不正确"
+            })
+        end
+
+        -- port
+        if port < 1 or port > 65535 then
+            return json:json({
+                success =false,
+                msg = "端口号为 1~65535 间的数字"
+            })
+        end
+
+        -- update node info to db
         local result = node_model:update_node(id, name, ip, port, api_username, api_password)
         if result then
             return res:json({
