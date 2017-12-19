@@ -98,7 +98,7 @@ return function(config, store)
 
         local name = req.body.name
         local ip = req.body.ip
-        local port = req.body.port
+        local port = tonumber(req.body.port)
         local api_username = req.body.api_username
         local api_password = req.body.api_password
 
@@ -135,16 +135,6 @@ return function(config, store)
             return res:json({
                 success = false,
                 msg = "IP 长度应为 7-15 位."
-            })
-        end
-
-        local ip_pattern = "^\d{1,3}(\.\d{1,3}){3}$"
-        local ip_match, err = smatch(ip, ip_pattern)
-
-        if not ip_match then
-            return res:json({
-                success = false,
-                msg = "IP 格式不正确"
             })
         end
 
@@ -206,7 +196,7 @@ return function(config, store)
         local id = req.body.id
         local name = req.body.name
         local ip = req.body.ip
-        local port = req.body.port
+        local port = tonumber(req.body.port)
         local api_username = req.body.api_username
         local api_password = req.body.api_password
 
@@ -243,16 +233,6 @@ return function(config, store)
             return res:json({
                 success = false,
                 msg = "IP 长度应为 7-15 位."
-            })
-        end
-
-        local ip_pattern = "^\d{1,3}(\.\d{1,3}){3}$"
-        local ip_match, err = smatch(ip, ip_pattern)
-
-        if not ip_match then
-            return res:json({
-                success = false,
-                msg = "IP 格式不正确"
             })
         end
 
